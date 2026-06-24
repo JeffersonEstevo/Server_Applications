@@ -1,0 +1,45 @@
+# Arquivos de sistema (gerados pelo Ubuntu/Linux)
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Configurações e variáveis de ambiente
+*.env
+*.env.local
+secret.json
+config.json
+*.key
+*.pem
+
+# Diretórios de Logs e Dados
+/logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Banco de dados e Cache
+*.sqlite
+*.sqlite3
+*.db
+/cache
+/temp
+/tmp
+
+# Compilação e Dependências (comuns em servidores, dependendo da stack)
+/node_modules
+/vendor
+/build
+/dist
+*.pyc
+*.pyo
+__pycache__/
+.pytest_cache/
+
+# Pastas e Arquivos que não devem ir para o Github
+/Configuracoes_Docker-Ubuntu_Server
