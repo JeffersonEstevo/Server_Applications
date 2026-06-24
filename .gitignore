@@ -42,4 +42,4 @@ __pycache__/
 .pytest_cache/
 
 # Pastas e Arquivos que não devem ir para o Github
-/Configuracoes_Docker-Ubuntu_Server
+#/Configuracoes_Docker-Ubuntu_Server

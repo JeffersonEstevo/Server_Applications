@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Configurações Docker - ubunttu Server</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Guia de Configuração: Ubuntu Server + Docker</h1>
+<p>Este guia contém todos os comandos necessários para instalar o SSH, configurar o ambiente Docker e colocar o seu primeiro projeto estruturado para rodar.</p>
+<hr>
+<h2>1. Configurar Conexão SSH</h2>
+<p>O Ubuntu Server geralmente traz o SSH instalado. Caso precise instalar ou ativar manualmente, utilize os comandos abaixo:</p>
+<pre class="language-bash"><code class="language-bash"># Atualiza a lista de pacotes do sistema
+sudo apt update
+# Instala o servidor SSH
+sudo apt install openssh-server -y
+# Ativa e inicia o serviço do SSH para rodar junto com o sistema
+sudo systemctl enable --now ssh
+# Verifica se o SSH está rodando corretamente
+sudo systemctl status ssh
+# Libera o SSH no firewall do Ubuntu (UFW)
+sudo ufw allow ssh
+# Ativa o firewall (confirme com 'y' se ele avisar sobre a conexão atual)
+sudo ufw enable</code></pre>
+<hr>
+<h2>2. Configurar o Ambiente para Docker</h2>
+<p>Comandos para configurar o repositório oficial e instalar a versão estável mais recente do Docker:</p>
+<pre class="language-bash"><code class="language-bash"># Instala dependências necessárias do sistema
+sudo apt install apt-transport-https ca-certificates curl software-properties-common -y
+# Cria o diretório para chaves de segurança (caso não exista)
+sudo mkdir -p /etc/apt/keyrings
+# Baixa e adiciona a chave GPG oficial do Docker
+curl -fsSL https://docker.com | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+# Adiciona o repositório oficial do Docker às fontes do APT
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://docker.com $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list &gt; /dev/null
+# Atualiza a lista de pacotes com o novo repositório integrado
+sudo apt update
+# Instala o Docker Engine, CLI, Containerd e o plugin do Docker Compose
+sudo apt install docker-ce docker-ce-cli containerd.io docker-compose-plugin -y
+# Adiciona seu usuário atual ao grupo do Docker (evita a necessidade de usar 'sudo' antes de cada comando do Docker)
+sudo usermod -aG docker $USER
+# Aplica a mudança de grupo imediatamente na sessão atual
+newgrp docker</code></pre>
+<hr>
+<h2>3. Comandos Principais do Docker</h2>
+<p>Guia rápido de gerenciamento para quem está iniciando com contêineres:</p>
+<pre class="language-bash"><code class="language-bash"># Baixar uma imagem do Docker Hub sem iniciar o contêiner
+docker pull ubuntu
+# Listar todas as imagens baixadas no servidor
+docker images
+# Criar e iniciar um contêiner (Exemplo com um servidor Web Nginx)
+# (-d = segundo plano | -p = mapeia porta externa:interna | --name = nomeia o contêiner)
+docker run -d -p 80:80 --name meu-servidor nginx
+# Listar apenas os contêineres que estão ATIVOS no momento
+docker ps
+# Listar TODOS os contêineres (tanto em execução quanto parados)
+docker ps -a
+# Parar um contêiner em execução
+docker stop meu-servidor
+# Iniciar um contêiner que já existe mas estava parado
+docker start meu-servidor
+# Remover permanentemente um contêiner (ele precisa ser parado antes)
+docker rm meu-servidor
+# Remover uma imagem do servidor (liberar espaço)
+docker rmi nginx</code></pre>
+<hr>
+<h2>4. Deploy de Projeto Automatizado (Docker Compose)</h2>
+<p>O Docker Compose permite gerenciar múltiplos serviços de um projeto usando apenas um arquivo de configuração.</p>
+<h3>Passo 1: Criar a pasta do seu projeto</h3>
+<pre class="language-bash"><code class="language-bash">mkdir meu-projeto &amp;&amp; cd meu-projeto</code></pre>
+<h3>Passo 2: Criar o arquivo de configuração</h3>
+<p>Crie um arquivo chamado <code>docker-compose.yml</code>:</p>
+<pre class="language-bash"><code class="language-bash">nano docker-compose.yml</code></pre>
+<h3>Passo 3: Adicionar a estrutura do ambiente</h3>
+<p>Cole o conteúdo abaixo dentro do arquivo (Este exemplo cria uma aplicação WordPress integrada com um banco de dados MySQL):</p>
+<pre class="language-yaml"><code class="language-yaml">version: '3.8'
+services:
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: senha_secreta_do_banco
+      MYSQL_DATABASE: wordpress
+  web:
+    image: wordpress:latest
+    restart: always
+    ports:
+      - "8080:80"
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: root
+      WORDPRESS_DB_PASSWORD: senha_secreta_do_banco
+      WORDPRESS_DB_NAME: wordpress
+    depends_on:
+      - db</code></pre>
+<p><em>(Para salvar e sair do editor Nano: Pressione <code>Ctrl + O</code>, depois <code>Enter</code>, e finalize com <code>Ctrl + X</code>).</em></p>
+<h3>Passo 4: Subir a aplicação</h3>
+<p>Execute o comando abaixo na mesma pasta onde o arquivo <code>docker-compose.yml</code> foi salvo:</p>
+<pre class="language-bash"><code class="language-bash">docker compose up -d</code></pre>
+<h3>Passo 5: Testar o acesso</h3>
+<p>Abra o navegador e digite o endereço IP do seu servidor seguido da porta configurada:</p>
+<pre class="language-text"><code class="language-text">http://IP_DO_SEU_SERVIDOR:8080</code></pre>
+<h3>Passo 6: Parar o projeto</h3>
+<p>Para encerrar todos os contêineres e redes criadas pelo projeto de uma só vez:</p>
+<pre class="language-bash"><code class="language-bash">docker compose down</code></pre>
+</body>
+</html>
