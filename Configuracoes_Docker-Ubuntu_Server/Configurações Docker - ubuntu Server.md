@@ -74,6 +74,9 @@ newgrp docker
 Guia rápido de gerenciamento para quem está iniciando com contêineres:
 
 ```bash
+# Verificar status do Docker
+sudo systemctl status docker
+
 # Baixar uma imagem do Docker Hub sem iniciar o contêiner
 docker pull ubuntu
 
